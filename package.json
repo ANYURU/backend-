@@ -1,0 +1,17 @@
+{
+  "name": "daweed",
+  "version": "1.0.0",
+  "description": "Consuming africa's talking API",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "Africa's",
+    "talking",
+    "API",
+    "consumption"
+  ],
+  "author": "Anyuru David Derrick",
+  "license": "ISC"
+}
