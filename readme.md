@@ -12,7 +12,7 @@ Re thought with supabase.
     [ ] Invoke the OTP generator.
     [ ] Store the OTP against the Phone number.
     [ ] Consume the Africa's talking API to send a message to the number provided.
-    [ ] Veify the code by comparing the one entered by the user with the one recorded against the number
+    [ ] Veify the code by comparing the one entered by the user with the one recorded against the number.
 
 that invokes the Africas talking API to send an SMS with an OTP to the number provided 
 [ ] verify the OTP
