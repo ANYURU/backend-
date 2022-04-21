@@ -14,7 +14,6 @@ const sendMessage = (phone_number, verification_code) => {
         message: `Bweyogerere Tubeerebumu Sacco. \n Your verification code is ${verification_code}.`,
         from: SENDERID,
     })
-    
 }
 
 module.exports=sendMessage
