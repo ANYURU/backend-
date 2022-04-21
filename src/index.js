@@ -9,17 +9,12 @@ const sendMessage = (phone_number, verification_code) => {
         apiKey: APIKEY
     });
     
-    client.SMS.send({
+    return client.SMS.send({
         to:phone_number,
         message: `Bweyogerere Tubeerebumu Sacco. \n Your verification code is ${verification_code}.`,
         from: SENDERID,
     })
-    .then((data) => {
-        return data
-    })
-    .catch((error) => {
-        return error
-    })
+    
 }
 
 module.exports=sendMessage

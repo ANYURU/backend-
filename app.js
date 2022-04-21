@@ -7,10 +7,10 @@ const app = express()
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use('/', async (req, res) => {
+app.use('/', (req, res) => {
   const { phone_number, verification_code } = req.body
-  const response = await sendMessage(phone_number, verification_code)
-  console.log(response)
+  sendMessage(phone_number, verification_code).then((data) => console.log(data)).catch(error => console.log(error))
+
 })
 
 const PORT = 5000
