@@ -1,14 +1,25 @@
 import africastalking from 'africastalking'
+require('dotenv').config()
 
-const client = africastalking({
-    username: 'sandbox',
-    apiKey: 'be4b73c861d09ca11bd5fd25dc947d01d7dc81e966dc242b20f0947ba06a7a46'
-});
+const { USERNAME, APIKEY, SENDERID } = process.env
 
-client.SMS.send({
-    to:'+256757501751',
-    message: 'Bweyogerere Tubeerebumu Sacco. \n Your verification code is 898787.',
-    from: 'DAVID-M',
-})
-.then(() => console.log('Message is sent successfully.'))
-.catch((error) => console.log(error))
+const sendMessage = (phone_number, verification_code) => {
+    const client = africastalking({
+        username: USERNAME,
+        apiKey: APIKEY
+    });
+    
+    client.SMS.send({
+        to:phone_number,
+        message: `Bweyogerere Tubeerebumu Sacco. \n Your verification code is ${verification_code}.`,
+        from: SENDERID,
+    })
+    .then((data) => {
+        return data
+    })
+    .catch((error) => {
+        return error
+    })
+}
+
+module.exports=sendMessage

@@ -4,8 +4,9 @@
   "description": "Consuming africa's talking API",
   "main": "index.js",
   "scripts": {
-    "test": "jest", 
-    "start": "node -r esm src/index.js"
+    "test": "jest",
+    "start": "node -r esm src/index.js",
+    "dev": "nodemon -r esm app.js"
   },
   "keywords": [
     "Africa's",
@@ -16,7 +17,10 @@
   "author": "Anyuru David Derrick",
   "license": "ISC",
   "dependencies": {
-    "africastalking": "^0.5.5"
+    "africastalking": "^0.5.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "nodemon": "^2.0.15"
   },
   "devDependencies": {
     "esm": "^3.2.25"
