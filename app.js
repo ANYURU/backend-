@@ -1,23 +1,23 @@
 const express = require('express');
 const sendMessage = require('./src/sendMessage');
+const cors = require('cors')
 require('dotenv').config();
 
 // Importing the supabase client.
 import { supabase } from './src/helpers/supabase';
 import generateOTP from './src/generateOTP';
-import { response } from 'express';
 
 // Instantiating express.
 const app = express()
 
-// Middleware for (parsing json data,  reading from encoded urls)
+// Middleware for (avoiding cross origin ,parsing json data,  reading from encoded urls)
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Sending endpoint.
-app.get('/send', async (req, res) => {
+app.use('/send', async (req, res) => {
     const { phone_number } = req.body
-    console.log(phone_number)
 
     // Generating the OTP
     const verification_code = await generateOTP()
@@ -26,39 +26,25 @@ app.get('/send', async (req, res) => {
        res.json(error)
 
     } else {
-        // Inserting the verification code against the number.
+        // Updating the verification code against the number.
         const { error } = await supabase.from('signup').update({verification_code: verification_code}).eq('phone_number', phone_number)
         if(error) {
             res.json(error)
         } else {
-            // res.json(data)
-            // Sending the OTP
             sendMessage(phone_number, verification_code)
             .then((data) => {
-                console.log(data)
                 res.json({...data})
             })
             .catch(error => {
-                console.log(error)
                 res.status(400).json({...error})
             })
-
-            // Table cleanup after OTP expiry
-            setTimeout( async () => {
-                const { data, error } = supabase.from('signup').delete().match({phone_number: phone_number})
-                if(error) {
-                    res.json(error)
-                } else {
-                    res.status(400).json({msg: 'OTP expired'})
-                }
-            }, 1000*60*3);
         }
     }
 
 })
 
 // verifying the otp
-app.get('/verify', async (req, res) => {
+app.use('/verify', async (req, res) => {
     const { phone_number, verification_code:otp } = req.body
     const { data, error } = await supabase.from('signup').select('verification_code').eq('phone_number', phone_number)
     if(error) {
