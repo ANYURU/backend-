@@ -5,6 +5,7 @@ require('dotenv').config();
 // Importing the supabase client.
 import { supabase } from './src/helpers/supabase';
 import generateOTP from './src/generateOTP';
+import { response } from 'express';
 
 // Instantiating express.
 const app = express()
@@ -14,7 +15,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Sending endpoint.
-app.get('/send', async (req, res) => {
+app.use('/send', async (req, res) => {
     const { phone_number } = req.body
 
     // Generating the OTP
@@ -40,19 +41,34 @@ app.get('/send', async (req, res) => {
                 // console.log(error)
                 res.status(400).json({...error})
             })
+
+            // Table cleanup after OTP expiry
+            setTimeout( async () => {
+                const { data, error } = supabase.from('signup').delete().match({phone_number: phone_number})
+                if(error) {
+                    res.json(error)
+                } else {
+                    res.status(400).json({msg: 'OTP expired'})
+                }
+            }, 1000*60*3);
         }
     }
 
 })
 
-// app.post('/verify', async (req, res) => {
-//     const { phone_number, verification_code } = req.body
-//     const { data, error } = await supabase.from('signup').select('phone_number', 'verification_code').eq()
-
-
-
-
-// })
+// verifying the otp
+app.use('/verify', async (req, res) => {
+    const { phone_number, verification_code } = req.body
+    const { data, error } = await supabase.from('signup').select('verification_code').eq('phone_number', phone_number)
+    if(error) {
+        res.send(error)
+    } else {
+        const { verification_code: OTP } = data 
+        if(OTP === verification_code) {
+            res.status(200).json({msg: true })
+        }
+    }
+})
 
 const PORT = 5000 || process.env.PORT
 const server = app.listen(PORT, () => console.log(`Express is running on ${PORT}`))
