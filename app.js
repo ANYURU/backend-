@@ -15,18 +15,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Sending endpoint.
-app.use('/send', async (req, res) => {
+app.get('/send', async (req, res) => {
     const { phone_number } = req.body
+    console.log(phone_number)
 
     // Generating the OTP
     const verification_code = await generateOTP()
-    const { error } = await supabase.from('signup').select('phone_number').eq(phone_number)
+    const { error } = await supabase.from('signup').select('phone_number').eq('phone_number',phone_number)
     if( error ) {
        res.json(error)
 
     } else {
         // Inserting the verification code against the number.
-        const { error } = await supabase.from('signup').insert({verification_code: OTP}).eq('phone_number', phone_number)
+        const { error } = await supabase.from('signup').update({verification_code: verification_code}).eq('phone_number', phone_number)
         if(error) {
             res.json(error)
         } else {
@@ -34,11 +35,11 @@ app.use('/send', async (req, res) => {
             // Sending the OTP
             sendMessage(phone_number, verification_code)
             .then((data) => {
-                // console.log(data)
+                console.log(data)
                 res.json({...data})
             })
             .catch(error => {
-                // console.log(error)
+                console.log(error)
                 res.status(400).json({...error})
             })
 
@@ -57,15 +58,20 @@ app.use('/send', async (req, res) => {
 })
 
 // verifying the otp
-app.use('/verify', async (req, res) => {
-    const { phone_number, verification_code } = req.body
+app.get('/verify', async (req, res) => {
+    const { phone_number, verification_code:otp } = req.body
     const { data, error } = await supabase.from('signup').select('verification_code').eq('phone_number', phone_number)
     if(error) {
-        res.send(error)
+        res.json(error)
     } else {
-        const { verification_code: OTP } = data 
-        if(OTP === verification_code) {
-            res.status(200).json({msg: true })
+        console.log(data) 
+        console.log(`otp: ${otp}`)
+        const [{ verification_code }] = data
+        console.log(`verification code: ${verification_code}`)
+        if(otp === verification_code) {
+            res.json({msg: true })
+        } else {
+            res.status(400).json({msg: 'invalid otp'})
         }
     }
 })
