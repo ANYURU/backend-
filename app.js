@@ -1,5 +1,5 @@
 const express = require('express');
-const sendMessage = require('./src/index');
+const sendMessage = require('./src/sendMessage');
 require('dotenv').config();
 
 const app = express()
