@@ -1,9 +1,9 @@
-import africastalking from 'africastalking'
+const  africastalking = require('africastalking')
 require('dotenv').config()
 
 const { USERNAME, APIKEY, SENDERID } = process.env
 
-const sendMessage = (phone_number, verification_code) => {
+const sendCodeToPhone = (phone_number, verification_code) => {
     const client = africastalking({
         username: USERNAME,
         apiKey: APIKEY
@@ -16,4 +16,4 @@ const sendMessage = (phone_number, verification_code) => {
     })
 }
 
-module.exports=sendMessage
+module.exports=sendCodeToPhone

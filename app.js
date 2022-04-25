@@ -1,5 +1,5 @@
 const express = require('express');
-const sendMessage = require('./src/sendMessage');
+const sendCodeToPhone = require('./src/getOtp');
 const cors = require('cors')
 require('dotenv').config();
 
@@ -16,27 +16,29 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Sending endpoint.
-app.use('/send', async (req, res) => {
+app.use('/get-otp', async (req, res) => {
     const { phone_number } = req.body
-
     // Generating the OTP
-    const verification_code = await generateOTP()
-    const { error } = await supabase.from('signup').select('phone_number').eq('phone_number',phone_number)
+    console.log('api started')
+    const otp = generateOTP()
+    const { error } = await supabase.from('otps').select('phone_number').eq('phone_number',phone_number)
     if( error ) {
-       res.json(error)
+        res.json(error)
 
     } else {
         // Updating the verification code against the number.
-        const { error } = await supabase.from('signup').update({verification_code: verification_code}).eq('phone_number', phone_number)
+        const { error } = await supabase.from('otps').update({otp: otp}).eq('phone_number', phone_number)
+        
         if(error) {
             res.json(error)
+
         } else {
-            sendMessage(phone_number, verification_code)
+            sendCodeToPhone(phone_number, otp)
             .then((data) => {
-                res.json({...data})
+                res.status(200).json(data)
             })
             .catch(error => {
-                res.status(400).json({...error})
+                res.status(400).json(error)
             })
         }
     }
@@ -45,19 +47,19 @@ app.use('/send', async (req, res) => {
 
 // verifying the otp
 app.use('/verify', async (req, res) => {
-    const { phone_number, verification_code:otp } = req.body
-    const { data, error } = await supabase.from('signup').select('verification_code').eq('phone_number', phone_number)
+    const { phone_number, otp: submittedOtp } = req.body
+    const { data, error } = await supabase.from('otps').select('otp').eq('phone_number', phone_number)
     if(error) {
         res.json(error)
     } else {
         console.log(data) 
-        console.log(`otp: ${otp}`)
-        const [{ verification_code }] = data
-        console.log(`verification code: ${verification_code}`)
-        if(otp === verification_code) {
-            res.json({msg: true })
+        const [{ otp }] = data
+        console.log(`otp: ${typeof(otp)}`)
+        console.log(`submitted otp: ${typeof(submittedOtp)}`)
+        if(otp === submittedOtp) {
+            res.status(200).json({msg: true })
         } else {
-            res.status(400).json({msg: 'invalid otp'})
+            res.status(400).json({error: 'invalid otp'})
         }
     }
 })
