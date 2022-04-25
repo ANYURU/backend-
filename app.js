@@ -1,5 +1,5 @@
 const express = require('express');
-const sendCodeToPhone = require('./src/getOtp');
+const sendCodeToPhone = require('./src/sendCodeToPhone');
 const cors = require('cors')
 require('dotenv').config();
 
