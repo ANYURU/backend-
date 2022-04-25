@@ -19,7 +19,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/get-otp', async (req, res) => {
     const { phone_number } = req.body
     // Generating the OTP
-    console.log('api started')
+    // console.log('api started')
     const otp = generateOTP()
     const { error } = await supabase.from('otps').select('phone_number').eq('phone_number',phone_number)
     if( error ) {
@@ -27,12 +27,12 @@ app.use('/get-otp', async (req, res) => {
 
     } else {
         // Updating the verification code against the number.
-        const { error } = await supabase.from('otps').update({otp: otp}).eq('phone_number', phone_number)
-        
+        const { error, data } = await supabase.from('otps').update({otp: otp}).eq('phone_number', phone_number)
+    
         if(error) {
             res.json(error)
-
         } else {
+            console.log(data)
             sendCodeToPhone(phone_number, otp)
             .then((data) => {
                 res.status(200).json(data)
@@ -45,22 +45,28 @@ app.use('/get-otp', async (req, res) => {
 })
 
 // verifying the otp
-app.use('/verify', async (req, res) => {
+app.use('/verify-otp', async (req, res) => {
     const { phone_number, otp: submittedOtp } = req.body
-    const { data, error } = await supabase.from('otps').select('otp').eq('phone_number', phone_number)
-    if(error) {
-        res.json(error)
-    } else {
-        console.log(data) 
-        const [{ otp }] = data
-        console.log(`otp: ${typeof(otp)}`)
-        console.log(`submitted otp: ${typeof(submittedOtp)}`)
-        if(otp === submittedOtp) {
-            res.status(200).json({msg: true })
+    if(phone_number && submittedOtp) {
+        const { data, error } = await supabase.from('otps').select('otp').eq('phone_number', phone_number)
+        if(error) {
+            res.json(error)
         } else {
-            res.status(400).json({error: 'invalid otp'})
+            if(data.length > 0) {
+                const [{ otp }] = data
+                if ( otp === submittedOtp ) {
+                    res.json({ msg: true })
+                } else {
+                    res.json({error: 'invalid otp'})
+                }
+            } else {
+                res.json({msg: "no otp please regenerate otp."})
+            }
         }
+    } else {
+        res.json({msg: 'missing phone number or otp'})
     }
+    
 })
 
 const PORT = 5000 || process.env.PORT

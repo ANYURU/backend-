@@ -4,14 +4,18 @@ require('dotenv').config()
 const { USERNAME, APIKEY, SENDERID } = process.env
 
 /**
- * @typedef Africastalking  
+ * @typedef {Object} Africastalking
+ * @property {number} status 200 If the message is successfuly sent to the user and the entry is successfully added to the otps table in supabase. And 400 if the message is not not successfully sent to the user.
+ * @property {string} error If the message is not successfully sent tot the user.
+ * @property {string} msg If the message is successgully sent to the user.
  */
 
 /**
- * Consume africas talking api
- * @param {string} phone_number 
- * @param {number} otp 
- * @returns { Promise<Africastalking> } A promise to Africas's talking SMS client. 
+ * @function
+ * @name sendCodeToPhone
+ * @param {string} phone_number the number of the person intending to signup.
+ * @param {number} otp the one time password submitted the person intending to signup.
+ * @returns { Promise<> } A promise that returns a json object.
  */
 
 const sendCodeToPhone = (phone_number, otp) => {
