@@ -42,7 +42,6 @@ app.use('/get-otp', async (req, res) => {
             })
         }
     }
-
 })
 
 // verifying the otp

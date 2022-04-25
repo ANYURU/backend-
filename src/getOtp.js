@@ -3,7 +3,18 @@ require('dotenv').config()
 
 const { USERNAME, APIKEY, SENDERID } = process.env
 
-const sendCodeToPhone = (phone_number, verification_code) => {
+/**
+ * @typedef Africastalking  
+ */
+
+/**
+ * Consume africas talking api
+ * @param {string} phone_number 
+ * @param {number} otp 
+ * @returns { Promise<Africastalking> } A promise to Africas's talking SMS client. 
+ */
+
+const sendCodeToPhone = (phone_number, otp) => {
     const client = africastalking({
         username: USERNAME,
         apiKey: APIKEY
@@ -11,7 +22,7 @@ const sendCodeToPhone = (phone_number, verification_code) => {
     
     return client.SMS.send({
         to:phone_number,
-        message: `Bweyogerere Tubeerebumu Sacco. \n Your verification code is ${verification_code}.`,
+        message: `Bweyogerere Tubeerebumu Sacco. \n Your verification code is ${otp}.`,
         from: SENDERID,
     })
 }
