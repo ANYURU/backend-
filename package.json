@@ -2,7 +2,7 @@
   "name": "daweed",
   "version": "1.0.0",
   "description": "Consuming africa's talking API",
-  "main": "api/index.js",
+  "main": "./api/index.js",
   "scripts": {
     "test": "jest",
     "start": "node -r esm app.js",
