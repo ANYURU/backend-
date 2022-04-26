@@ -1,7 +1,8 @@
-Signup with phone and OTP verification using Afica's talking as SMS service provider and supabase.
-Technologies to be used.
-
 **Express backend for custom verification of users before signing up to the system and being persisted in the users table as supabase users.**
+Technologies used.
+1. Express
+2. Supabase
+
 Services provided by the API
 1. Generation of a six digit random one time password(OTP). 
 2. An SMS service that consumes the africastalking API. Used to send the OTP to a user via SMS.
@@ -24,4 +25,3 @@ commands.
 
     2. To run the server in the developer environment run:
         >npm run dev
-
