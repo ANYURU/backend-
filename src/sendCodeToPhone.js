@@ -15,7 +15,7 @@ const { USERNAME, APIKEY, SENDERID } = process.env
  * @name sendCodeToPhone
  * @param {string} phone_number the number of the person intending to signup.
  * @param {number} otp the one time password submitted the person intending to signup.
- * @returns { Promise<> } A promise that returns a json object.
+ * @returns { Promise<Africastalking> } A promise that returns a json object.
  */
 
 const sendCodeToPhone = (phone_number, otp) => {
