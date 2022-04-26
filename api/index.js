@@ -1,6 +1,5 @@
 const express = require('express');
 const sendCodeToPhone = require('../src/sendCodeToPhone');
-const cors = require('cors')
 require('dotenv').config();
 
 // Importing the supabase client.
