@@ -17,6 +17,7 @@ app.use(express.urlencoded({ extended: false }));
 
 // Sending endpoint.
 app.use('/get-otp', async (req, res) => {
+    
     const { phone_number } = req.body
     // Generating the OTP
     // console.log('api started')
@@ -27,7 +28,7 @@ app.use('/get-otp', async (req, res) => {
 
     } else {
         // Updating the verification code against the number.
-        const { error, data } = await supabase.from('otps').update({otp: otp}).eq('phone_number', phone_number)
+        const { error, data } = await supabase.from('otps').update({otp: otp, status:"valid"}).eq('phone_number', phone_number)
     
         if(error) {
             res.json(error)

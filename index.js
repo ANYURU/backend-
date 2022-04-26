@@ -17,58 +17,75 @@ app.use(express.urlencoded({ extended: false }));
 
 // Sending endpoint.
 app.use('/get-otp', async (req, res) => {
-    const { phone_number } = req.body
-    // Generating the OTP
-    // console.log('api started')
-    const otp = generateOTP()
-    const { error } = await supabase.from('otps').select('phone_number').eq('phone_number',phone_number)
-    if( error ) {
-        res.json(error)
-
-    } else {
-        // Updating the verification code against the number.
-        const { error, data } = await supabase.from('otps').update({otp: otp}).eq('phone_number', phone_number)
-    
-        if(error) {
+    try{
+        const { phone_number } = req.body
+        // Generating the OTP
+        // console.log('api started')
+        const otp = generateOTP()
+        const { error } = await supabase.from('otps').select('phone_number').eq('phone_number',phone_number)
+        if( error ) {
             res.json(error)
+    
         } else {
-            console.log(data)
-            sendCodeToPhone(phone_number, otp)
-            .then((data) => {
-                res.status(200).json(data)
-            })
-            .catch(error => {
-                res.status(400).json(error)
-            })
+            // Updating the verification code against the number.
+            const { error, data } = await supabase.from('otps').update({otp: otp, status: "valid"}).eq('phone_number', phone_number)
+        
+            if(error) {
+                res.json(error)
+            } else {
+                console.log('else started')
+                sendCodeToPhone(phone_number, otp)
+                .then((data) => {
+                    res.status(200).json(data)
+                })
+                .catch(error => {
+                    res.status(400).json(error)
+                })
+            }
         }
+    } catch (error) {
+        res.status(500).json({msg: "bad request"})
     }
 })
 
 // verifying the otp
 app.use('/verify-otp', async (req, res) => {
-    const { phone_number, otp: submittedOtp } = req.body
-    if(phone_number && submittedOtp) {
-        const { data, error } = await supabase.from('otps').select('otp').eq('phone_number', phone_number)
-        if(error) {
-            res.json(error)
-        } else {
-            if(data.length > 0) {
-                const [{ otp }] = data
-                if ( otp === submittedOtp ) {
-                    res.json({ msg: true })
-                } else {
-                    res.json({error: 'invalid otp'})
-                }
+    try {
+        const { phone_number, otp: submittedOtp } = req.body
+        if(phone_number && submittedOtp) {
+            const { data, error } = await supabase.from('otps').select('otp', 'status').eq('phone_number', phone_number)
+            if(error) {
+                res.json(error)
             } else {
-                res.json({msg: "no otp please regenerate otp."})
+                if(data.length > 0) {
+                    const [{ otp, status }] = data
+                    if ( status === 'valid' ) {
+                        if ( otp === submittedOtp ) {
+                            const { error, data } = await supabase.from('otps').update({ status: 'used' }).eq('phone_number', phone_number)
+                            if(error) {
+                                res.json(error)
+                            } else {
+                                console.log(data)
+                                res.json({ msg: true })
+                            }
+                        } else {
+                            res.json({error: 'invalid otp'})
+                        }
+                    } else {
+                        res.json({error: 'expired otp'})
+                    }
+                } else {
+                    res.json({msg: "no otp please regenerate otp."})
+                }
             }
+        } else {
+            res.json({msg: 'missing phone number or otp'})
         }
-    } else {
-        res.json({msg: 'missing phone number or otp'})
-    }
-    
+    } catch (error) {
+        res.status(500).json({msg: "bad request"})
+    }   
 })
 
 const PORT = 5000 || process.env.PORT
 const server = app.listen(PORT, () => console.log(`Express is running on ${PORT}`))
-module.exports(app)
+module.exports = app
