@@ -71,4 +71,4 @@ app.use('/verify-otp', async (req, res) => {
 
 const PORT = 5000 || process.env.PORT
 const server = app.listen(PORT, () => console.log(`Express is running on ${PORT}`))
-
+module.exports(app)
