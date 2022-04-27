@@ -1,6 +1,11 @@
+const sendCodeToPhone = require('../sendCodeToPhone');
+const generateOTP = require('../generateOTP')
+
+// Importing the supabase client.
+import { supabase } from '../helpers/supabase/supabase';
+
 function allowCors(func) {
     return async (req, res) => {
-        res.setHeader('Access-Control-Allow-Credentials', true)
         res.setHeader('Access-Control-Allow-Origin', '*')
         res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT')
         res.setHeader(
@@ -8,7 +13,7 @@ function allowCors(func) {
             'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
         )
         if (req.method === 'OPTIONS') {
-            res.status(200).end()
+            res.status(200)
             return
         }
         return await func(req, res)
@@ -22,16 +27,19 @@ const getOtpHandler = async (req, res) => {
         // Generating the OTP
         console.log('api started')
         const otp = generateOTP()
+        console.log(otp)
         const { error } = await supabase.from('otps').select('phone_number').eq('phone_number',phone_number)
         if( error ) {
-            console.log(error)
+            console.log('reached')
             res.json(error)
     
         } else {
             // Updating the verification code against the number.
+            console.log('else started')
             const { error, data } = await supabase.from('otps').update({otp: otp, status: "valid"}).eq('phone_number', phone_number)
         
             if(error) {
+                console.log('supa error')
                 res.json(error)
             } else {
                 console.log('else started')

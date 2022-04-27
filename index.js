@@ -1,12 +1,7 @@
 const express = require('express');
-const sendCodeToPhone = require('./src/sendCodeToPhone');
 const cors = require('cors')
 require('dotenv').config();
 const {allowCors, getOtpHandler, verifyOtpHandler} = require('./src/handlers/handlers')
-
-// Importing the supabase client.
-import { supabase } from './src/helpers/supabase/supabase';
-import generateOTP from './src/generateOTP';
 
 // Instantiating express.
 const app = express()
