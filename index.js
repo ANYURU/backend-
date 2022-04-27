@@ -11,7 +11,7 @@ import generateOTP from './src/generateOTP';
 const app = express()
 
 // Middleware for (avoiding cross origin ,parsing json data,  reading from encoded urls)
-app.use(cors());
+// app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
