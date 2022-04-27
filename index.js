@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Sending endpoint.
-app.post('/get-otp', async (req, res) => {
+app.use('/get-otp', async (req, res) => {
     try{
         const { phone_number } = req.body
         // Generating the OTP
@@ -49,7 +49,7 @@ app.post('/get-otp', async (req, res) => {
 })
 
 // verifying the otp
-app.post('/verify-otp', async (req, res) => {
+app.use('/verify-otp', async (req, res) => {
     try {
         const { phone_number, otp: submittedOtp } = req.body
         if(phone_number && submittedOtp) {
