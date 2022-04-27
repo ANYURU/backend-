@@ -2,6 +2,7 @@ const express = require('express');
 const sendCodeToPhone = require('./src/sendCodeToPhone');
 const cors = require('cors')
 require('dotenv').config();
+const {allowCors, getOtpHandler, verifyOtpHandler} = require('./src/handlers/handlers')
 
 // Importing the supabase client.
 import { supabase } from './src/helpers/supabase/supabase';
@@ -15,83 +16,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use(function(req, res, next){
-    res.header("Access-Control-Allow-Origin", "*")
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-type, Accept")
-    next()
-})
-
 // Sending endpoint.
-app.use('/get-otp', async (req, res) => {
-    try{
-        const { phone_number } = req.body
-        // Generating the OTP
-        console.log('api started')
-        const otp = generateOTP()
-        const { error } = await supabase.from('otps').select('phone_number').eq('phone_number',phone_number)
-        if( error ) {
-            res.json(error)
-    
-        } else {
-            // Updating the verification code against the number.
-            const { error, data } = await supabase.from('otps').update({otp: otp, status: "valid"}).eq('phone_number', phone_number)
-        
-            if(error) {
-                res.json(error)
-            } else {
-                console.log('else started')
-                sendCodeToPhone(phone_number, otp)
-                .then((data) => {
-                    res.status(200).json(data)
-                })
-                .catch(error => {
-                    res.status(400).json(error)
-                })
-            }
-        }
-    } catch (error) {
-        res.status(500).json({msg: "bad request"})
-    }
-})
+app.use('/get-otp', allowCors(getOtpHandler))
 
 // verifying the otp
-app.use('/verify-otp', async (req, res) => {
-    try {
-        const { phone_number, otp: submittedOtp } = req.body
-        if(phone_number && submittedOtp) {
-            const { data, error } = await supabase.from('otps').select().eq('phone_number', phone_number)
-            if(error) {
-                res.json(error)
-            } else {
-                if(data.length > 0) {
-                    const [{ otp, status }] = data
-                    console.log(data)
-                    if ( status === 'valid' ) {
-                        if ( otp === submittedOtp ) {
-                            const { error, data } = await supabase.from('otps').update({ status: 'used' }).eq('phone_number', phone_number)
-                            if(error) {
-                                res.json(error)
-                            } else {
-                                console.log(data)
-                                res.json({ msg: true })
-                            }
-                        } else {
-                            res.json({error: 'invalid otp'})
-                        }
-                    } else {
-                        res.json({error: 'expired otp'})
-                    }
-                } else {
-                    res.json({msg: "no otp please regenerate otp."})
-                }
-            }
-        } else {
-            res.json({msg: 'missing phone number or otp'})
-        }
-    } catch (error) {
-        res.status(500).json({msg: "bad request"})
-    }   
-})
+app.use('/verify-otp', allowCors(verifyOtpHandler))
 
 const PORT = 5000 || process.env.PORT
 const server = app.listen(PORT, () => console.log(`Express is running on ${PORT}`))
