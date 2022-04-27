@@ -1,11 +1,11 @@
 const express = require('express');
-const sendCodeToPhone = require('./src/sendCodeToPhone');
+const sendCodeToPhone = require('../src/sendCodeToPhone');
 const cors = require('cors')
 require('dotenv').config();
 
 // Importing the supabase client.
-import { supabase } from './src/helpers/supabase/supabase';
-import generateOTP from './src/generateOTP';
+import { supabase } from '../src/helpers/supabase/supabase';
+import generateOTP from '../src/generateOTP';
 
 // Instantiating express.
 const app = express()
@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Sending endpoint.
-app.use('/get-otp', async (req, res) => {
+app.use('/api/get-otp', async (req, res) => {
     try{
         const { phone_number } = req.body
         // Generating the OTP
@@ -49,7 +49,7 @@ app.use('/get-otp', async (req, res) => {
 })
 
 // verifying the otp
-app.use('/verify-otp', async (req, res) => {
+app.use('/api/verify-otp', async (req, res) => {
     try {
         const { phone_number, otp: submittedOtp } = req.body
         if(phone_number && submittedOtp) {
