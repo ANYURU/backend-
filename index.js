@@ -51,6 +51,7 @@ app.use('/get-otp', async (req, res) => {
 
 // verifying the otp
 app.use('/verify-otp', async (req, res) => {
+    res.setHeader('Access-Control-Allow-Cross-Origin', '*')
     try {
         const { phone_number, otp: submittedOtp } = req.body
         if(phone_number && submittedOtp) {
