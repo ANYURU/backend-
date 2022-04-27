@@ -1,11 +1,11 @@
 const express = require('express');
-const sendCodeToPhone = require('../src/sendCodeToPhone');
+const sendCodeToPhone = require('./src/sendCodeToPhone');
 const cors = require('cors')
 require('dotenv').config();
 
 // Importing the supabase client.
-import { supabase } from '../src/helpers/supabase/supabase';
-import generateOTP from '../src/generateOTP';
+import { supabase } from './src/helpers/supabase/supabase';
+import generateOTP from './src/generateOTP';
 
 // Instantiating express.
 const app = express()
@@ -16,11 +16,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Sending endpoint.
-app.use('/api/get-otp', async (req, res) => {
+app.use('/get-otp', async (req, res) => {
     try{
         const { phone_number } = req.body
         // Generating the OTP
-        // console.log('api started')
+        console.log('api started')
         const otp = generateOTP()
         const { error } = await supabase.from('otps').select('phone_number').eq('phone_number',phone_number)
         if( error ) {
@@ -49,16 +49,17 @@ app.use('/api/get-otp', async (req, res) => {
 })
 
 // verifying the otp
-app.use('/api/verify-otp', async (req, res) => {
+app.use('/verify-otp', async (req, res) => {
     try {
         const { phone_number, otp: submittedOtp } = req.body
         if(phone_number && submittedOtp) {
-            const { data, error } = await supabase.from('otps').select('otp', 'status').eq('phone_number', phone_number)
+            const { data, error } = await supabase.from('otps').select().eq('phone_number', phone_number)
             if(error) {
                 res.json(error)
             } else {
                 if(data.length > 0) {
                     const [{ otp, status }] = data
+                    console.log(data)
                     if ( status === 'valid' ) {
                         if ( otp === submittedOtp ) {
                             const { error, data } = await supabase.from('otps').update({ status: 'used' }).eq('phone_number', phone_number)

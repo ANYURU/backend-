@@ -5,14 +5,14 @@
   "main": "./api/index.js",
   "scripts": {
     "test": "jest",
-    "start": "node -r esm app.js",
-    "dev": "nodemon -r esm app.js"
+    "start": "node -r esm index.js",
+    "dev": "nodemon -r esm index.js"
   },
   "keywords": [
-    "Africa's",
-    "talking",
+    "Africas talking",
+    "SMS",
     "API",
-    "consumption"
+    "Backend"
   ],
   "author": "Anyuru David Derrick",
   "license": "ISC",
