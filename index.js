@@ -17,6 +17,7 @@ app.use(express.urlencoded({ extended: false }));
 
 // Sending endpoint.
 app.use('/get-otp', async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*')
     try{
         const { phone_number } = req.body
         // Generating the OTP
