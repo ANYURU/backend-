@@ -12,10 +12,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Sending endpoint.
-app.use('/get-otp', allowCors(getOtpHandler))
+app.post('/get-otp', allowCors(getOtpHandler))
 
 // verifying the otp
-app.use('/verify-otp', allowCors(verifyOtpHandler))
+app.post('/verify-otp', allowCors(verifyOtpHandler))
 
 const PORT = 5000 || process.env.PORT
 const server = app.listen(PORT, () => console.log(`Express is running on ${PORT}`))
